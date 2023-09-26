@@ -107,8 +107,8 @@ def generate_random_color():
 def plot_iteration_convergence_with_function(
         approximation_list: List[float], 
         original_function: Callable[[float], float], 
-        x_range: List[float], 
-        N: int = 20):
+        x_range: List[float]
+        ):
     """
     Create a plot to visualize the convergence of fixed-point iteration along with the original function.
 
@@ -132,8 +132,6 @@ def plot_iteration_convergence_with_function(
         >>> plot_iteration_convergence_with_function(results, g_x, x_range, N=6)
     """
     iteration_numbers = range(len(approximation_list) - 1)
-    absolute_differences = [abs(approximation_list[i + 1] - approximation_list[i]) for i in iteration_numbers]
-
     plt.figure(figsize=(10, 6))
     
     # Plot both the original function and the approximations with random colors

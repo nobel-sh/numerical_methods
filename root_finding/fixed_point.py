@@ -3,6 +3,7 @@ from typing import Callable,List
 import matplotlib.pyplot as plt
 import numpy as np
 import random
+from tabulate import tabulate
 
 def fixed_point_iteration(g: Callable[[float], float], initial_guess: float, N: int = 20, max_iterations: int = 200) -> [float]:
     """
@@ -58,11 +59,18 @@ def print_approximation_list(approximation_list: [float], N: int = 20):
         >>> results = [1.000000, 1.500000, 1.416667, 1.414216]
         >>> print_approximation_list(results, N=6)
     """
+
+    data = []
     for index in range(len(approximation_list) - 1):
-        print(f"Iteration {index} :")
-        print(f"\tcurrent approximation =  {approximation_list[index]:.{N}f}")
-        print(f"\tnext approximation    =  {approximation_list[index+1]:.{N}f}")
-        print(f"\tabsolute difference   =  {abs(approximation_list[index+1] - approximation_list[index]):.{N}f}")
+        iteration = index
+        current_approximation = f"{approximation_list[index]:.{N}f}"
+        next_approximation = f"{approximation_list[index+1]:.{N}f}"
+        absolute_difference = f"{abs(approximation_list[index+1] - approximation_list[index]):.{N}f}"
+        data.append([iteration, current_approximation, next_approximation, absolute_difference])
+    
+    headers = ["Iteration", "Current Approximation", "Next Approximation", "Absolute Difference"]
+    table = tabulate(data, headers, tablefmt="pretty")
+    print(table)
 
 
 def is_convergent(g: sp.Expr, x0: float) -> bool:
@@ -130,7 +138,7 @@ def plot_iteration_convergence_with_function(
     
     # Plot both the original function and the approximations with random colors
     original_color = generate_random_color()
-    plt.plot(x_range, [original_function(x) for x in x_range], label='Original Function', linestyle='-', color=original_color)
+    plt.plot(x_range, [original_function(x) for x in x_range], label='F(X)', linestyle='-', color=original_color)
 
     # Generate a continuous x-axis based on iteration number
     x_continuous = np.linspace(0, len(approximation_list) - 2, len(approximation_list) - 1)
@@ -153,14 +161,14 @@ def plot_iteration_convergence_with_function(
 
 def main():
     try:
-        f_x: str = input("Enter an equation f(x) or type 'exit' to quit: ")
-        # f_x = "sin(x)-10*x+10"
+        # f_x: str = input("Enter an equation f(x) or type 'exit' to quit: ")
+        f_x = "2*x-3-cos(x)"
         if f_x.lower() == 'exit':
             exit()
         parsed_f_x: sp.Expr = sp.sympify(f_x)
 
-        g_x: str = input("Provide an equation for g(x) such that x = g(x) from the previously given f(x): ")
-        # g_x = "1+sin(x)/10"
+        # g_x: str = input("Provide an equation for g(x) such that x = g(x) from the previously given f(x): ")
+        g_x = "(cos(x)+3)/2"
         parsed_g_x: sp.Expr = sp.sympify(g_x)
         initial_guess_x: float = float(input("Enter an initial guess: "))
 
@@ -174,7 +182,7 @@ def main():
         results: [float] = fixed_point_iteration(lambda x: parsed_g_x.subs('x', x), initial_guess_x, N=N, max_iterations=max_iterations)
         print_approximation_list(results)
         print(f"Fixed point: {results.pop():.{N}f}")
-        x_range = np.linspace(1.0, 2.0, 100)
+        x_range = np.linspace(0, 20, 1000)
         plot_iteration_convergence_with_function(results, lambda x:parsed_f_x.subs('x',x), x_range, N=20)
     except Exception as e:
         print(e)
